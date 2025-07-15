@@ -9,6 +9,11 @@ export interface User {
   passwordCreatedAt: Date;
   failedLoginAttempts: number;
   lockedUntil?: Date;
+  isEmailVerified: boolean;
+  emailVerificationToken?: string;
+  emailVerificationExpires?: Date;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
 }
 
 export interface UserProfile {
@@ -20,6 +25,7 @@ export interface UserProfile {
   lastLoginAt?: Date;
   passwordCreatedAt: Date;
   needsPasswordChange: boolean;
+  isEmailVerified: boolean;
 }
 
 export interface AuthTokenPayload {
@@ -43,6 +49,23 @@ export interface RegisterRequest {
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface EmailVerificationRequest {
+  token: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
 }
 
 export interface AuthResponse {

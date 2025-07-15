@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { userStore } from './userStore';
+import { initializeEmailService } from './emailService';
 import { 
   User, 
   UserProfile, 
@@ -7,7 +8,11 @@ import {
   LoginRequest, 
   RegisterRequest, 
   ChangePasswordRequest,
-  AuthResponse 
+  AuthResponse,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  EmailVerificationRequest,
+  ResendVerificationRequest
 } from '../models/user';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'aether-beasts-secret-key-change-in-production';
@@ -77,19 +82,31 @@ class AuthService {
         registerData.username
       );
 
-      // Generate token
-      const token = this.generateToken(user);
-
-      // Update last login
-      await userStore.updateLastLogin(user.id);
+      // Send verification email (if not admin)
+      if (user.role !== 'admin' && user.emailVerificationToken) {
+        try {
+          const emailService = initializeEmailService();
+          await emailService.sendVerificationEmail(
+            user.email,
+            user.username,
+            user.emailVerificationToken
+          );
+          console.log(`📧 Verification email sent to: ${user.email}`);
+        } catch (error) {
+          console.error('Failed to send verification email:', error);
+          // Don't fail registration if email fails
+        }
+      }
 
       console.log(`✅ User registered successfully: ${user.email} (${user.username})`);
 
       return {
         success: true,
-        message: 'Registration successful',
+        message: user.role === 'admin' 
+          ? 'Registration successful' 
+          : 'Registration successful! Please check your email to verify your account.',
         user: userStore.userToProfile(user),
-        token
+        token: user.isEmailVerified ? this.generateToken(user) : undefined
       };
 
     } catch (error: any) {
@@ -152,6 +169,14 @@ class AuthService {
 
       // Reset failed login attempts on successful login
       await userStore.resetFailedLoginAttempts(user.id);
+
+      // Check if email is verified
+      if (!user.isEmailVerified) {
+        return {
+          success: false,
+          message: 'Please verify your email address before logging in. Check your email for the verification link.'
+        };
+      }
 
       // Check if password needs to be changed
       const userProfile = userStore.userToProfile(user);
@@ -252,6 +277,179 @@ class AuthService {
       return {
         success: false,
         message: 'Failed to change password'
+      };
+    }
+  }
+
+  // Email verification methods
+  async verifyEmail(verificationData: EmailVerificationRequest): Promise<AuthResponse> {
+    try {
+      const result = await userStore.verifyEmail(verificationData.token);
+      
+      if (result.success && result.user) {
+        // Generate token now that email is verified
+        const token = this.generateToken(result.user);
+        
+        // Update last login
+        await userStore.updateLastLogin(result.user.id);
+        
+        console.log(`✅ Email verified successfully: ${result.user.email}`);
+        
+        return {
+          success: true,
+          message: 'Email verified successfully! You can now log in.',
+          user: userStore.userToProfile(result.user),
+          token
+        };
+      } else {
+        return {
+          success: false,
+          message: result.message
+        };
+      }
+    } catch (error: any) {
+      console.error('Email verification error:', error);
+      return {
+        success: false,
+        message: 'Email verification failed'
+      };
+    }
+  }
+
+  async resendVerificationEmail(resendData: ResendVerificationRequest): Promise<AuthResponse> {
+    try {
+      const user = await userStore.findUserByEmail(resendData.email);
+      
+      if (!user) {
+        return {
+          success: false,
+          message: 'User not found'
+        };
+      }
+
+      if (user.isEmailVerified) {
+        return {
+          success: false,
+          message: 'Email is already verified'
+        };
+      }
+
+      // Generate new verification token
+      const token = await userStore.generateEmailVerificationToken(user.id);
+      
+      if (!token) {
+        return {
+          success: false,
+          message: 'Failed to generate verification token'
+        };
+      }
+
+      // Send verification email
+      const emailService = initializeEmailService();
+      const emailSent = await emailService.sendVerificationEmail(
+        user.email,
+        user.username,
+        token
+      );
+
+      if (!emailSent) {
+        return {
+          success: false,
+          message: 'Failed to send verification email'
+        };
+      }
+
+      console.log(`📧 Verification email resent to: ${user.email}`);
+
+      return {
+        success: true,
+        message: 'Verification email sent! Please check your email.'
+      };
+
+    } catch (error: any) {
+      console.error('Resend verification error:', error);
+      return {
+        success: false,
+        message: 'Failed to resend verification email'
+      };
+    }
+  }
+
+  // Password reset methods
+  async forgotPassword(forgotData: ForgotPasswordRequest): Promise<AuthResponse> {
+    try {
+      const user = await userStore.findUserByEmail(forgotData.email);
+      
+      if (!user) {
+        // Don't reveal if email exists for security
+        return {
+          success: true,
+          message: 'If an account with this email exists, you will receive a password reset link.'
+        };
+      }
+
+      // Generate reset token
+      const token = await userStore.generatePasswordResetToken(user.id);
+      
+      if (!token) {
+        return {
+          success: false,
+          message: 'Failed to generate reset token'
+        };
+      }
+
+      // Send reset email
+      const emailService = initializeEmailService();
+      const emailSent = await emailService.sendPasswordResetEmail(
+        user.email,
+        user.username,
+        token
+      );
+
+      if (!emailSent) {
+        console.error('Failed to send password reset email');
+        // Don't reveal email send failure for security
+      }
+
+      console.log(`📧 Password reset email sent to: ${user.email}`);
+
+      return {
+        success: true,
+        message: 'If an account with this email exists, you will receive a password reset link.'
+      };
+
+    } catch (error: any) {
+      console.error('Forgot password error:', error);
+      return {
+        success: false,
+        message: 'Failed to process password reset request'
+      };
+    }
+  }
+
+  async resetPassword(resetData: ResetPasswordRequest): Promise<AuthResponse> {
+    try {
+      const result = await userStore.resetPassword(resetData.token, resetData.newPassword);
+      
+      if (result.success && result.user) {
+        console.log(`✅ Password reset successfully: ${result.user.email}`);
+        
+        return {
+          success: true,
+          message: 'Password reset successfully! You can now log in with your new password.',
+          user: userStore.userToProfile(result.user)
+        };
+      } else {
+        return {
+          success: false,
+          message: result.message
+        };
+      }
+    } catch (error: any) {
+      console.error('Reset password error:', error);
+      return {
+        success: false,
+        message: 'Password reset failed'
       };
     }
   }

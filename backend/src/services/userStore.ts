@@ -55,7 +55,10 @@ class UserStore {
       role,
       createdAt: now,
       passwordCreatedAt: now,
-      failedLoginAttempts: 0
+      failedLoginAttempts: 0,
+      isEmailVerified: role === 'admin', // Admin accounts are automatically verified
+      emailVerificationToken: role === 'admin' ? undefined : uuidv4(),
+      emailVerificationExpires: role === 'admin' ? undefined : new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
     };
 
     // Store user
@@ -99,7 +102,8 @@ class UserStore {
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt,
       passwordCreatedAt: user.passwordCreatedAt,
-      needsPasswordChange
+      needsPasswordChange,
+      isEmailVerified: user.isEmailVerified
     };
   }
 
@@ -208,6 +212,103 @@ class UserStore {
   async isAdmin(userId: string): Promise<boolean> {
     const user = this.users.get(userId);
     return user?.role === 'admin' || false;
+  }
+
+  // Email verification methods
+  async generateEmailVerificationToken(userId: string): Promise<string | null> {
+    const user = this.users.get(userId);
+    if (!user) return null;
+
+    const token = uuidv4();
+    user.emailVerificationToken = token;
+    user.emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    this.users.set(userId, user);
+    
+    return token;
+  }
+
+  async verifyEmail(token: string): Promise<{ success: boolean; user?: User; message: string }> {
+    // Find user by verification token
+    const user = Array.from(this.users.values()).find(u => 
+      u.emailVerificationToken === token && 
+      u.emailVerificationExpires && 
+      u.emailVerificationExpires > new Date()
+    );
+
+    if (!user) {
+      return { success: false, message: 'Invalid or expired verification token' };
+    }
+
+    // Mark email as verified
+    user.isEmailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
+    this.users.set(user.id, user);
+
+    return { success: true, user, message: 'Email verified successfully' };
+  }
+
+  async findUserByVerificationToken(token: string): Promise<User | null> {
+    return Array.from(this.users.values()).find(u => 
+      u.emailVerificationToken === token && 
+      u.emailVerificationExpires && 
+      u.emailVerificationExpires > new Date()
+    ) || null;
+  }
+
+  // Password reset methods
+  async generatePasswordResetToken(userId: string): Promise<string | null> {
+    const user = this.users.get(userId);
+    if (!user) return null;
+
+    const token = uuidv4();
+    user.passwordResetToken = token;
+    user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    this.users.set(userId, user);
+    
+    return token;
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; user?: User; message: string }> {
+    // Find user by reset token
+    const user = Array.from(this.users.values()).find(u => 
+      u.passwordResetToken === token && 
+      u.passwordResetExpires && 
+      u.passwordResetExpires > new Date()
+    );
+
+    if (!user) {
+      return { success: false, message: 'Invalid or expired password reset token' };
+    }
+
+    // Validate password strength
+    const passwordValidation = this.validatePasswordStrength(newPassword);
+    if (!passwordValidation.valid) {
+      return { success: false, message: passwordValidation.message || 'Invalid password' };
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    
+    // Update user
+    user.password = hashedPassword;
+    user.passwordCreatedAt = new Date();
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    user.failedLoginAttempts = 0;
+    user.lockedUntil = undefined;
+    
+    this.users.set(user.id, user);
+
+    return { success: true, user, message: 'Password reset successfully' };
+  }
+
+  async findUserByResetToken(token: string): Promise<User | null> {
+    return Array.from(this.users.values()).find(u => 
+      u.passwordResetToken === token && 
+      u.passwordResetExpires && 
+      u.passwordResetExpires > new Date()
+    ) || null;
   }
 }
 

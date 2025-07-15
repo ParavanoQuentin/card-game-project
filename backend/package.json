@@ -19,6 +19,7 @@
   "license": "ISC",
   "description": "Backend for Aether Beasts card game",
   "dependencies": {
+    "@getbrevo/brevo": "^2.5.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",

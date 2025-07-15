@@ -55,6 +55,10 @@ const swaggerOptions = {
               enum: ['user', 'admin'],
               example: 'user'
             },
+            isEmailVerified: {
+              type: 'boolean',
+              example: true
+            },
             createdAt: {
               type: 'string',
               format: 'date-time',
@@ -147,6 +151,52 @@ const swaggerOptions = {
             newPassword: {
               type: 'string',
               example: 'newpassword123'
+            }
+          }
+        },
+        ForgotPasswordRequest: {
+          type: 'object',
+          required: ['email'],
+          properties: {
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'user@example.com'
+            }
+          }
+        },
+        ResetPasswordRequest: {
+          type: 'object',
+          required: ['token', 'newPassword'],
+          properties: {
+            token: {
+              type: 'string',
+              example: 'reset-token-123'
+            },
+            newPassword: {
+              type: 'string',
+              example: 'newpassword123'
+            }
+          }
+        },
+        EmailVerificationRequest: {
+          type: 'object',
+          required: ['token'],
+          properties: {
+            token: {
+              type: 'string',
+              example: 'verification-token-123'
+            }
+          }
+        },
+        ResendVerificationRequest: {
+          type: 'object',
+          required: ['email'],
+          properties: {
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'user@example.com'
             }
           }
         },
