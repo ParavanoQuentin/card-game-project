@@ -1,0 +1,517 @@
+/* En-tête d'authentification mystique */
+.auth-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1.5rem 2.5rem;
+  background: linear-gradient(135deg, 
+    rgba(13, 17, 23, 0.9) 0%, 
+    rgba(22, 27, 34, 0.8) 100%);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--accent-bg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.welcome-text {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--text-gold);
+  font-weight: 500;
+  text-shadow: 0 0 8px rgba(184, 134, 11, 0.5);
+  letter-spacing: 0.5px;
+}
+
+.admin-panel-button {
+  padding: 0.7rem 1.4rem;
+  background: linear-gradient(135deg, var(--ancient-gold) 0%, var(--ember-orange) 100%);
+  color: var(--primary-bg);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-panel-button:hover {
+  background: linear-gradient(135deg, var(--text-gold) 0%, var(--ancient-gold) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-golden);
+  border-color: var(--text-gold);
+}
+
+.change-password-button {
+  padding: 0.7rem 1.4rem;
+  background: linear-gradient(135deg, var(--shadow-green) 0%, var(--ethereal-blue) 100%);
+  color: var(--text-primary);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.4s ease;
+}
+
+.change-password-button:hover {
+  background: linear-gradient(135deg, var(--ethereal-blue) 0%, var(--shadow-green) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(74, 144, 184, 0.4);
+  border-color: var(--ethereal-blue);
+}
+
+.logout-button {
+  padding: 0.7rem 1.2rem;
+  background: linear-gradient(135deg, 
+    rgba(125, 133, 144, 0.2) 0%, 
+    rgba(125, 133, 144, 0.1) 100%);
+  color: var(--text-secondary);
+  border: 2px solid var(--accent-bg);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.4s ease;
+}
+
+.logout-button:hover {
+  background: linear-gradient(135deg, 
+    rgba(125, 133, 144, 0.3) 0%, 
+    rgba(125, 133, 144, 0.2) 100%);
+  border-color: var(--text-silver);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.login-button,
+.register-button {
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-button {
+  background: transparent;
+  color: var(--text-gold);
+  border: 2px solid var(--ancient-gold);
+}
+
+.login-button:hover {
+  background: linear-gradient(135deg, 
+    rgba(184, 134, 11, 0.1) 0%, 
+    rgba(184, 134, 11, 0.05) 100%);
+  border-color: var(--text-gold);
+  color: var(--text-gold);
+  box-shadow: var(--shadow-golden);
+  transform: translateY(-2px);
+}
+
+.register-button {
+  background: linear-gradient(135deg, var(--mystical-purple) 0%, var(--ethereal-blue) 100%);
+  color: var(--text-primary);
+  border: 2px solid transparent;
+}
+
+.register-button:hover {
+  background: linear-gradient(135deg, var(--ethereal-blue) 0%, var(--mystical-purple) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-mystical);
+  border-color: var(--mystical-purple);
+}
+
+.homepage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, 
+    var(--primary-bg) 0%, 
+    var(--secondary-bg) 30%, 
+    var(--tertiary-bg) 70%, 
+    var(--primary-bg) 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Overlay mystique */
+.homepage::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(111, 66, 193, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(184, 134, 11, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(74, 144, 184, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-section {
+  text-align: center;
+  padding: 6rem 2rem;
+  background: linear-gradient(135deg, 
+    rgba(13, 17, 23, 0.4) 0%, 
+    rgba(22, 27, 34, 0.6) 50%, 
+    rgba(13, 17, 23, 0.4) 100%);
+  backdrop-filter: blur(20px);
+  position: relative;
+  z-index: 1;
+}
+
+.game-title {
+  font-family: var(--font-heading);
+  font-size: 4.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 20px rgba(184, 134, 11, 0.6);
+  background: linear-gradient(135deg, 
+    var(--ancient-gold) 0%, 
+    var(--text-gold) 30%, 
+    var(--mystical-purple) 70%, 
+    var(--ethereal-blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  animation: runes 6s infinite;
+}
+
+.game-subtitle {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  margin-bottom: 3.5rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mythology-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.mythology-card {
+  background: linear-gradient(135deg, 
+    rgba(33, 38, 45, 0.8) 0%, 
+    rgba(48, 54, 61, 0.6) 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  backdrop-filter: blur(15px);
+  border: 2px solid var(--accent-bg);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.mythology-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(184, 134, 11, 0.1), 
+    transparent);
+  transition: left 0.5s ease;
+}
+
+.mythology-card:hover::before {
+  left: 100%;
+}
+
+.mythology-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--ancient-gold);
+  box-shadow: var(--shadow-golden);
+}
+
+.mythology-card.greek {
+  border-left: 4px solid var(--ancient-gold);
+}
+
+.mythology-card.egyptian {
+  border-left: 4px solid var(--ember-orange);
+}
+
+.mythology-card.norse {
+  border-left: 4px solid var(--ethereal-blue);
+}
+
+.mythology-card.chinese {
+  border-left: 4px solid var(--ember-orange);
+}
+
+.mythology-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--text-gold);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(184, 134, 11, 0.5);
+}
+
+.mythology-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  margin-bottom: 0;
+}
+
+.action-section {
+  padding: 6rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  margin-bottom: 5rem;
+  flex-wrap: wrap;
+}
+
+.primary-button, .secondary-button {
+  padding: 1.2rem 2.5rem;
+  font-size: 1.3rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 1px;
+  border: 2px solid transparent;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 220px;
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-button {
+  background: linear-gradient(135deg, var(--ancient-gold) 0%, var(--ember-orange) 100%);
+  color: var(--primary-bg);
+  box-shadow: var(--shadow-golden);
+}
+
+.primary-button:hover {
+  background: linear-gradient(135deg, var(--text-gold) 0%, var(--ancient-gold) 100%);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(184, 134, 11, 0.5);
+  border-color: var(--text-gold);
+}
+
+.secondary-button {
+  background: transparent;
+  color: var(--text-gold);
+  border: 2px solid var(--ancient-gold);
+}
+
+.secondary-button:hover {
+  background: linear-gradient(135deg, 
+    rgba(184, 134, 11, 0.1) 0%, 
+    rgba(184, 134, 11, 0.05) 100%);
+  color: var(--text-gold);
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--text-gold);
+  box-shadow: var(--shadow-golden);
+}
+
+.game-rules {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, 
+    rgba(22, 27, 34, 0.6) 0%, 
+    rgba(33, 38, 45, 0.4) 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  margin: 2rem 0;
+}
+
+.game-rules h2 {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  margin-bottom: 2.5rem;
+  color: var(--text-gold);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px rgba(184, 134, 11, 0.6);
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.rule-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.rule-item h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #ffd700;
+}
+
+.rule-item p {
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+/* Footer Styles */
+.homepage-footer {
+  background: linear-gradient(135deg, 
+    rgba(13, 17, 23, 0.95) 0%, 
+    rgba(22, 27, 34, 0.9) 100%);
+  border-top: 1px solid var(--accent-bg);
+  margin-top: 4rem;
+  padding: 2rem 0 0 0;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.footer-section h4 {
+  color: var(--text-gold);
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 8px rgba(184, 134, 11, 0.3);
+}
+
+.footer-section p {
+  color: var(--text-primary);
+  opacity: 0.8;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-link {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 0.25rem 0;
+  transition: color 0.3s ease;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: var(--text-gold);
+}
+
+.footer-text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  padding: 0.25rem 0;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding: 1.5rem 2rem;
+  margin-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.footer-bottom p {
+  color: var(--text-secondary);
+  opacity: 0.7;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .game-title {
+    font-size: 2.5rem;
+  }
+  
+  .mythology-preview {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .rules-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .footer-links {
+    align-items: center;
+  }
+}

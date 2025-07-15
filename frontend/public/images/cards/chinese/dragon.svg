@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
+  <defs>
+    <linearGradient id="dragonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF6347;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="600" fill="#8B0000"/>
+  <!-- Dragon body (serpentine) -->
+  <path d="M50 300 Q150 200 250 250 Q350 300 300 400 Q250 450 150 400 Q50 350 100 300" fill="url(#dragonGrad)" stroke="#8B0000" stroke-width="3"/>
+  <!-- Dragon head -->
+  <ellipse cx="300" cy="400" rx="40" ry="30" fill="#FFD700"/>
+  <!-- Dragon eyes -->
+  <circle cx="285" cy="390" r="8" fill="#FF0000"/>
+  <circle cx="315" cy="390" r="8" fill="#FF0000"/>
+  <!-- Horns -->
+  <polygon points="280,375 275,355 290,360" fill="#8B4513"/>
+  <polygon points="320,375 325,355 310,360" fill="#8B4513"/>
+  <!-- Whiskers -->
+  <line x1="260" y1="400" x2="240" y2="395" stroke="#FFD700" stroke-width="3"/>
+  <line x1="260" y1="410" x2="240" y2="415" stroke="#FFD700" stroke-width="3"/>
+  <!-- Flames -->
+  <path d="M340 400 Q350 380 360 400 Q370 385 375 405" fill="#FF4500" opacity="0.8"/>
+  <!-- Scales pattern -->
+  <circle cx="200" cy="280" r="8" fill="#B8860B" opacity="0.6"/>
+  <circle cx="220" cy="300" r="8" fill="#B8860B" opacity="0.6"/>
+  <circle cx="180" cy="320" r="8" fill="#B8860B" opacity="0.6"/>
+  <text x="200" y="500" text-anchor="middle" fill="white" font-size="32" font-weight="bold">LONG</text>
+  <text x="200" y="540" text-anchor="middle" fill="white" font-size="18">Celestial Dragon</text>
+</svg>

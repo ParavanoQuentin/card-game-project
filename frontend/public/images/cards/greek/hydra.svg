@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
+  <defs>
+    <linearGradient id="hydraGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#006400;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#32CD32;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="600" fill="url(#hydraGrad)"/>
+  <!-- Multiple snake heads -->
+  <circle cx="120" cy="120" r="25" fill="#228B22"/>
+  <circle cx="180" cy="100" r="30" fill="#228B22"/>
+  <circle cx="220" cy="100" r="30" fill="#228B22"/>
+  <circle cx="280" cy="120" r="25" fill="#228B22"/>
+  <circle cx="200" cy="140" r="35" fill="#228B22"/>
+  <!-- Snake necks -->
+  <path d="M120 145 Q130 180 140 220" stroke="#228B22" stroke-width="15" fill="none"/>
+  <path d="M180 130 Q185 170 190 220" stroke="#228B22" stroke-width="18" fill="none"/>
+  <path d="M220 130 Q215 170 210 220" stroke="#228B22" stroke-width="18" fill="none"/>
+  <path d="M280 145 Q270 180 260 220" stroke="#228B22" stroke-width="15" fill="none"/>
+  <path d="M200 175 Q200 200 200 220" stroke="#228B22" stroke-width="20" fill="none"/>
+  <!-- Body -->
+  <ellipse cx="200" cy="300" rx="100" ry="80" fill="#228B22"/>
+  <text x="200" y="500" text-anchor="middle" fill="white" font-size="32" font-weight="bold">HYDRA</text>
+  <text x="200" y="540" text-anchor="middle" fill="white" font-size="18">Multi-headed Serpent</text>
+</svg>

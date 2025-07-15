@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: aether-beasts-db
+    environment:
+      POSTGRES_DB: aether_beasts
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - aether-network
+
+  # Backend API
+  backend:
+    build: ./backend
+    container_name: aether-beasts-backend
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:password123@postgres:5432/aether_beasts
+      - FRONTEND_URL=http://localhost:3000
+      - NODE_ENV=production
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+    networks:
+      - aether-network
+    volumes:
+      - ./backend/src:/app/src
+    restart: unless-stopped
+
+  # Frontend React App
+  frontend:
+    build: ./frontend
+    container_name: aether-beasts-frontend
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - aether-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: aether-beasts-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./infra/nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - aether-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  aether-network:
+    driver: bridge

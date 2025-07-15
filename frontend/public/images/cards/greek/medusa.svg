@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
+  <defs>
+    <linearGradient id="medusaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2F4F2F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#556B2F;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="600" fill="url(#medusaGrad)"/>
+  <circle cx="200" cy="180" r="70" fill="#8FBC8F"/>
+  <!-- Snake hair -->
+  <path d="M150 120 Q140 100 135 110 Q130 120 140 125" stroke="#228B22" stroke-width="6" fill="none"/>
+  <path d="M170 115 Q160 95 155 105 Q150 115 160 120" stroke="#228B22" stroke-width="6" fill="none"/>
+  <path d="M230 115 Q240 95 245 105 Q250 115 240 120" stroke="#228B22" stroke-width="6" fill="none"/>
+  <path d="M250 120 Q260 100 265 110 Q270 120 260 125" stroke="#228B22" stroke-width="6" fill="none"/>
+  <!-- Eyes -->
+  <circle cx="180" cy="170" r="8" fill="#FF0000"/>
+  <circle cx="220" cy="170" r="8" fill="#FF0000"/>
+  <!-- Mouth -->
+  <path d="M190 190 Q200 200 210 190" stroke="#8B0000" stroke-width="3" fill="none"/>
+  <text x="200" y="500" text-anchor="middle" fill="white" font-size="32" font-weight="bold">MEDUSA</text>
+  <text x="200" y="540" text-anchor="middle" fill="white" font-size="18">Gorgon Sister</text>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
+  <defs>
+    <radialGradient id="raGrad" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <rect width="400" height="600" fill="url(#raGrad)"/>
+  <!-- Sun disc -->
+  <circle cx="200" cy="150" r="80" fill="#FFFF00" stroke="#FF8C00" stroke-width="8"/>
+  <!-- Sun rays -->
+  <line x1="200" y1="50" x2="200" y2="30" stroke="#FFD700" stroke-width="6"/>
+  <line x1="280" y1="150" x2="300" y2="150" stroke="#FFD700" stroke-width="6"/>
+  <line x1="200" y1="250" x2="200" y2="270" stroke="#FFD700" stroke-width="6"/>
+  <line x1="120" y1="150" x2="100" y2="150" stroke="#FFD700" stroke-width="6"/>
+  <line x1="256" y1="94" x2="270" y2="80" stroke="#FFD700" stroke-width="6"/>
+  <line x1="256" y1="206" x2="270" y2="220" stroke="#FFD700" stroke-width="6"/>
+  <line x1="144" y1="206" x2="130" y2="220" stroke="#FFD700" stroke-width="6"/>
+  <line x1="144" y1="94" x2="130" y2="80" stroke="#FFD700" stroke-width="6"/>
+  <!-- Sacred symbols -->
+  <text x="200" y="350" text-anchor="middle" fill="#8B4513" font-size="40">☥</text>
+  <text x="160" y="400" text-anchor="middle" fill="#8B4513" font-size="30">𓂀</text>
+  <text x="240" y="400" text-anchor="middle" fill="#8B4513" font-size="30">𓁹</text>
+  <text x="200" y="500" text-anchor="middle" fill="white" font-size="28" font-weight="bold">RA BLESSING</text>
+  <text x="200" y="540" text-anchor="middle" fill="white" font-size="16">Solar Power</text>
+</svg>

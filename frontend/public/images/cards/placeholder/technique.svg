@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="600" viewBox="0 0 400 600">
+  <defs>
+    <radialGradient id="techniqueGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#9370DB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4B0082;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  <rect width="400" height="600" fill="url(#techniqueGrad)"/>
+  <!-- Magic circle -->
+  <circle cx="200" cy="250" r="100" fill="none" stroke="#FFD700" stroke-width="6"/>
+  <circle cx="200" cy="250" r="80" fill="none" stroke="#FFFF00" stroke-width="3"/>
+  <circle cx="200" cy="250" r="60" fill="none" stroke="#FFD700" stroke-width="2"/>
+  <!-- Magic symbols -->
+  <text x="200" y="260" text-anchor="middle" fill="#FFD700" font-size="40">★</text>
+  <text x="150" y="220" text-anchor="middle" fill="#FFFF00" font-size="24">✦</text>
+  <text x="250" y="220" text-anchor="middle" fill="#FFFF00" font-size="24">✦</text>
+  <text x="150" y="300" text-anchor="middle" fill="#FFFF00" font-size="24">✦</text>
+  <text x="250" y="300" text-anchor="middle" fill="#FFFF00" font-size="24">✦</text>
+  <!-- Placeholder text -->
+  <text x="200" y="450" text-anchor="middle" fill="white" font-size="24" font-weight="bold">TECHNIQUE</text>
+  <text x="200" y="480" text-anchor="middle" fill="white" font-size="16">Magical Spell</text>
+  <text x="200" y="520" text-anchor="middle" fill="white" font-size="14" opacity="0.7">Image Loading...</text>
+</svg>

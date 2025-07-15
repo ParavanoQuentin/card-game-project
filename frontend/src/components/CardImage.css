@@ -1,0 +1,113 @@
+.card-image-container {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(135deg, 
+    var(--secondary-bg) 0%, 
+    var(--tertiary-bg) 50%, 
+    var(--accent-bg) 100%);
+  border: 2px solid var(--accent-bg);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.4s ease;
+  filter: brightness(0.9) contrast(1.1);
+}
+
+.card-image.loading {
+  opacity: 0;
+  filter: blur(5px);
+}
+
+.card-image:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1) contrast(1.2);
+}
+
+.image-loading-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, 
+    var(--mystical-purple) 0%, 
+    var(--ethereal-blue) 50%, 
+    var(--ancient-gold) 100%);
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--text-gold);
+  border-right-color: var(--mystical-purple);
+  animation: mysticSpin 1.5s ease-in-out infinite;
+}
+
+@keyframes mysticSpin {
+  0% {
+    transform: rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+    filter: hue-rotate(360deg);
+  }
+}
+
+.image-error-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, 
+    rgba(125, 133, 144, 0.8) 0%, 
+    rgba(125, 133, 144, 0.6) 100%);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  text-align: center;
+  padding: 12px;
+  font-size: 0.9rem;
+}
+
+.error-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-silver);
+}
+
+/* Effet de transition pour l'erreur */
+.image-error-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Animation de rotation pour l'ancienne animation (supprimée car on utilise mysticSpin) */
+
+/* Card type specific styling */
+.beast .card-image-container {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+}
+
+.technique .card-image-container {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.artifact .card-image-container {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+}
