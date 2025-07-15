@@ -1,0 +1,100 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: card-game-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: card-game
+          __path__: /var/log/app/*.log
+    pipeline_stages:
+      - json:
+          expressions:
+            timestamp: timestamp
+            level: level
+            message: message
+            service: service
+            gameId: gameId
+            playerId: playerId
+            action: action
+            error: error
+            attackerId: attackerId
+            defenderId: defenderId
+            cardId: cardId
+            cardName: cardName
+            damage: damage
+            hp: hp
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+      - labels:
+          level:
+          service:
+          action:
+      - output:
+          source: message
+
+  - job_name: card-game-errors
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: card-game-errors
+          __path__: /var/log/app/error.log
+    pipeline_stages:
+      - json:
+          expressions:
+            timestamp: timestamp
+            level: level
+            message: message
+            service: service
+            gameId: gameId
+            playerId: playerId
+            error: error
+            stack: stack
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+      - labels:
+          level:
+          service:
+      - output:
+          source: message
+
+  - job_name: card-game-debug
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: card-game-debug
+          __path__: /var/log/app/debug.log
+    pipeline_stages:
+      - json:
+          expressions:
+            timestamp: timestamp
+            level: level
+            message: message
+            service: service
+            gameId: gameId
+            playerId: playerId
+            action: action
+            performance_label: performance_label
+            duration_ms: duration_ms
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+      - labels:
+          level:
+          service:
+          action:
+      - output:
+          source: message

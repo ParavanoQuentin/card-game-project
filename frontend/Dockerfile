@@ -1,6 +1,9 @@
 # Frontend Dockerfile
 FROM node:18-alpine
 
+# Install wget for health checks
+RUN apk add --no-cache wget
+
 WORKDIR /app
 
 # Copy package files

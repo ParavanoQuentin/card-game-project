@@ -1,13 +1,14 @@
 export interface User {
   id: string;
   email: string;
-  password: string; // This will be hashed
+  passwordHash: string; // This will be hashed
   username: string;
-  role: 'user' | 'admin';
+  role?: 'user' | 'admin'; // Optional since it's not in DB schema yet
   createdAt: Date;
+  updatedAt: Date;
   lastLoginAt?: Date;
-  passwordCreatedAt: Date;
-  failedLoginAttempts: number;
+  passwordCreatedAt?: Date;
+  failedLoginAttempts?: number;
   lockedUntil?: Date;
 }
 
@@ -15,18 +16,19 @@ export interface UserProfile {
   id: string;
   email: string;
   username: string;
-  role: 'user' | 'admin';
+  role?: 'user' | 'admin';
   createdAt: Date;
+  updatedAt: Date;
   lastLoginAt?: Date;
-  passwordCreatedAt: Date;
-  needsPasswordChange: boolean;
+  passwordCreatedAt?: Date;
+  needsPasswordChange?: boolean;
 }
 
 export interface AuthTokenPayload {
   userId: string;
   email: string;
   username: string;
-  role: 'user' | 'admin';
+  role?: 'user' | 'admin';
 }
 
 export interface LoginRequest {

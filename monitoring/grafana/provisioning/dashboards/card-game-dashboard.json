@@ -1,0 +1,194 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Card Game Backend Monitoring",
+    "tags": ["card-game", "backend", "monitoring"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Game Actions Timeline",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"card-game\"} |= \"gameId\"",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 10,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "showCommonLabels": false,
+          "wrapLogMessage": false,
+          "prettifyLogMessage": false,
+          "enableLogDetails": true,
+          "dedupStrategy": "none",
+          "sortOrder": "Descending"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Error Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate({job=\"card-game\", level=\"error\"}[5m])",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 0,
+          "y": 10
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "yellow",
+                  "value": 0.1
+                },
+                {
+                  "color": "red",
+                  "value": 1
+                }
+              ]
+            },
+            "unit": "reqps"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "Game Actions per Minute",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate({job=\"card-game\"} |= \"action\"[1m])",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 6,
+          "x": 6,
+          "y": 10
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "reqps"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "Combat Events",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"card-game\"} |= \"COMBAT\"",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 6,
+          "w": 12,
+          "x": 12,
+          "y": 10
+        }
+      },
+      {
+        "id": 5,
+        "title": "Game Performance Metrics",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "avg by (performance_label) (duration_ms)",
+            "refId": "A",
+            "legendFormat": "{{performance_label}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 16
+        },
+        "yAxes": [
+          {
+            "label": "Duration (ms)",
+            "min": 0
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Action Types Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "count by (action) ({job=\"card-game\"} |= \"action\")",
+            "refId": "A",
+            "legendFormat": "{{action}}"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 16
+        }
+      },
+      {
+        "id": 7,
+        "title": "Recent Errors",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=\"card-game-errors\", level=\"error\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 24
+        },
+        "options": {
+          "showTime": true,
+          "showLabels": true,
+          "wrapLogMessage": true,
+          "prettifyLogMessage": true,
+          "enableLogDetails": true
+        }
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "5s",
+    "schemaVersion": 30,
+    "version": 1
+  }
+}
