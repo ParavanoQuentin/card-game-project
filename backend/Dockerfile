@@ -32,4 +32,4 @@ RUN mkdir -p /app/data
 EXPOSE 3001
 
 # Run migrations and start the app
-CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run db:seed && npm start"]

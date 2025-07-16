@@ -180,7 +180,7 @@ class UserService {
       id: user.id,
       email: user.email,
       username: user.username,
-      role: user.role || 'user',
+      role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       lastLoginAt: user.lastLoginAt,
@@ -198,7 +198,7 @@ class UserService {
       email: prismaUser.email,
       passwordHash: prismaUser.passwordHash,
       username: prismaUser.username,
-      role: 'user', // Default role since not in schema yet
+      role: prismaUser.role as 'user' | 'admin', // Now using role from database
       createdAt: prismaUser.createdAt,
       updatedAt: prismaUser.updatedAt,
       lastLoginAt: undefined,
@@ -251,17 +251,27 @@ class UserService {
   }
 
   /**
-   * Update user role (admin function) - simplified since role is not in schema yet
+   * Update user role (admin function)
    */
   async updateUserRole(userId: string, role: 'user' | 'admin'): Promise<User | null> {
-    // For now, we'll just return the user since role is not in the database schema
-    // This can be implemented when we add role to the schema
-    const user = await this.findUserById(userId);
-    if (user) {
-      user.role = role; // Update in memory for now
-      console.log(`User ${userId} role updated to ${role} (note: role not persisted to DB yet)`);
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      throw new Error('User not found');
     }
-    return user;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        role,
+        updatedAt: new Date()
+      }
+    });
+
+    console.log(`User ${userId} role updated to ${role}`);
+    return this.mapPrismaUserToUser(updatedUser);
   }
 
   /**

@@ -16,30 +16,35 @@ export async function seedUsers(prisma: PrismaClient) {
         username: 'admin',
         email: 'admin@aetherbeasts.com',
         password: 'Password123!',
+        role: 'admin' as const,
       },
       {
         id: 'player-001',
         username: 'player1',
         email: 'player1@example.com',
         password: 'Password123!',
+        role: 'user' as const,
       },
       {
         id: 'player-002',
         username: 'player2',
         email: 'player2@example.com',
         password: 'Password123!',
+        role: 'user' as const,
       },
       {
         id: 'test-user-001',
         username: 'testuser',
         email: 'test@example.com',
         password: 'Password123!',
+        role: 'user' as const,
       },
       {
         id: 'demo-user-001',
         username: 'demouser',
         email: 'demo@example.com',
         password: 'Password123!',
+        role: 'user' as const,
       },
     ];
 
@@ -50,6 +55,7 @@ export async function seedUsers(prisma: PrismaClient) {
         username: user.username,
         email: user.email,
         passwordHash: await bcrypt.hash(user.password, 12),
+        role: user.role,
       }))
     );
 

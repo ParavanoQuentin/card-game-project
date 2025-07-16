@@ -375,7 +375,7 @@ const requireAdmin = async (req: express.Request, res: express.Response, next: e
       });
     }
 
-    // Check if user is admin (note: role is not in DB schema yet, so this will default to false)
+    // Check if user is admin
     if (payload.role !== 'admin') {
       return res.status(403).json({
         success: false,
@@ -436,6 +436,50 @@ app.delete('/api/admin/users/:userId', requireAdmin, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to delete user',
+    });
+  }
+});
+
+app.put('/api/admin/users/:userId/role', requireAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+    const currentUser = (req as any).user;
+
+    if (userId === currentUser.userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot modify your own role',
+      });
+    }
+
+    if (!role || !['user', 'admin'].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid role. Must be "user" or "admin"',
+      });
+    }
+
+    const updatedUser = await userService.updateUserRole(userId, role);
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    console.log(`User ${userId} role updated to ${role} by admin ${currentUser.username}`);
+    res.status(200).json({
+      success: true,
+      message: 'User role updated successfully',
+      user: userService.userToProfile(updatedUser),
+    });
+  } catch (error) {
+    console.error('Update user role error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update user role',
     });
   }
 });

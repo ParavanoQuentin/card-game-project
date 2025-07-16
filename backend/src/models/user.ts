@@ -3,7 +3,7 @@ export interface User {
   email: string;
   passwordHash: string; // This will be hashed
   username: string;
-  role?: 'user' | 'admin'; // Optional since it's not in DB schema yet
+  role: 'user' | 'admin'; // Now required since it has a default in DB
   createdAt: Date;
   updatedAt: Date;
   lastLoginAt?: Date;
@@ -23,7 +23,7 @@ export interface UserProfile {
   id: string;
   email: string;
   username: string;
-  role?: 'user' | 'admin';
+  role: 'user' | 'admin';
   createdAt: Date;
   updatedAt: Date;
   lastLoginAt?: Date;
@@ -35,7 +35,7 @@ export interface AuthTokenPayload {
   userId: string;
   email: string;
   username: string;
-  role?: 'user' | 'admin';
+  role: 'user' | 'admin';
 }
 
 export interface LoginRequest {
