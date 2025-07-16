@@ -20,7 +20,7 @@ COPY prisma ./prisma
 RUN npx prisma generate
 
 # Copy source code
-COPY src ./src
+COPY . .
 
 # Build the app
 RUN npm run build

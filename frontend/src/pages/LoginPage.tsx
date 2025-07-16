@@ -138,6 +138,11 @@ const LoginPage: React.FC = () => {
               Create one here
             </Link>
           </p>
+          <p>
+            <Link to="/forgot-password" className="auth-link">
+              Forgot your password?
+            </Link>
+          </p>
           <Link to="/" className="back-home-link">
             ← Back to Home
           </Link>

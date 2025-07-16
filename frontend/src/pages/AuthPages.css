@@ -251,6 +251,107 @@
   color: #3b82c4;
 }
 
+/* Email Verification Styles */
+.verification-content {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.verification-content.success {
+  color: var(--success-color, #28a745);
+}
+
+.verification-content.error {
+  color: var(--error-color, #dc3545);
+}
+
+.success-icon, .error-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.loading-spinner.large {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+}
+
+.resend-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--accent-bg);
+}
+
+.resend-section h3 {
+  color: var(--text-color);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.resend-form {
+  margin-top: 1rem;
+}
+
+.resend-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.resend-form input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--accent-bg);
+  border-radius: 8px;
+  background: var(--secondary-bg);
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.resend-form input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.1);
+}
+
+.auth-button {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-accent) 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0.5rem;
+}
+
+.auth-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-strong);
+}
+
+.auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auth-button.loading {
+  position: relative;
+  color: transparent;
+}
+
+.auth-button.loading .loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+}
+
 /* Responsive design */
 @media (max-width: 480px) {
   .auth-page {

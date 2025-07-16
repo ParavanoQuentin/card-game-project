@@ -10,6 +10,13 @@ export interface User {
   passwordCreatedAt?: Date;
   failedLoginAttempts?: number;
   lockedUntil?: Date;
+  // Email verification fields
+  emailVerified?: boolean;
+  emailVerificationToken?: string;
+  emailVerificationTokenExpiry?: Date;
+  // Password reset fields
+  passwordResetToken?: string;
+  passwordResetTokenExpiry?: Date;
 }
 
 export interface UserProfile {
@@ -52,4 +59,13 @@ export interface AuthResponse {
   message: string;
   user?: UserProfile;
   token?: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
 }

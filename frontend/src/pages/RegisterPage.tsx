@@ -100,8 +100,10 @@ const RegisterPage: React.FC = () => {
     });
     
     if (result.success) {
-      console.log('✅ Registration successful, redirecting to home');
-      navigate('/');
+      console.log('✅ Registration successful');
+      // Show success message and redirect to login since email verification is required
+      alert('Registration successful! Please check your email to verify your account before logging in.');
+      navigate('/login');
     }
   };
 

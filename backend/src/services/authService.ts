@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { userService } from './userService';
+import { emailService } from './emailService';
 import {
   User,
   UserProfile,
@@ -70,22 +71,34 @@ class AuthService {
         };
       }
 
+      console.log('DEBUG', process.env.BREVO_API_KEY);
+      
       // Create user
       const user = await userService.createUser(registerData.email, registerData.password, registerData.username);
 
-      // Generate token
-      const token = this.generateToken(user);
+      // Send verification email
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const verificationUrl = `${frontendUrl}/verify-email?token=${user.emailVerificationToken}`;
+      
+      const emailSent = await emailService.sendVerificationEmail({
+        email: user.email,
+        username: user.username,
+        verificationToken: user.emailVerificationToken!,
+        verificationUrl
+      });
 
-      // Update last login
-      await userService.updateLastLogin(user.id);
+      if (!emailSent) {
+        console.warn('⚠️ Failed to send verification email, but user was created');
+      }
 
       console.log(`✅ User registered successfully: ${user.email} (${user.username})`);
 
       return {
         success: true,
-        message: 'Registration successful',
+        message: 'Registration successful! Please check your email to verify your account.',
         user: userService.userToProfile(user),
-        token,
+        // Note: We don't provide a token here since email is not verified yet
+        // Users can still login but should be reminded to verify their email
       };
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -245,6 +258,169 @@ class AuthService {
       return {
         success: false,
         message: 'Failed to change password',
+      };
+    }
+  }
+
+  /**
+   * Verify email with token
+   */
+  async verifyEmail(token: string): Promise<AuthResponse> {
+    try {
+      const user = await userService.verifyEmail(token);
+      
+      if (!user) {
+        return {
+          success: false,
+          message: 'Invalid or expired verification token',
+        };
+      }
+
+      // Send welcome email
+      await emailService.sendWelcomeEmail(user.email, user.username);
+
+      // Generate token for automatic login after verification
+      const authToken = this.generateToken(user);
+
+      console.log(`✅ Email verified successfully for user: ${user.email}`);
+
+      return {
+        success: true,
+        message: 'Email verified successfully! Welcome to Aether Beasts!',
+        user: userService.userToProfile(user),
+        token: authToken,
+      };
+    } catch (error: any) {
+      console.error('Email verification error:', error);
+      return {
+        success: false,
+        message: 'Email verification failed',
+      };
+    }
+  }
+
+  /**
+   * Resend verification email
+   */
+  async resendVerificationEmail(email: string): Promise<AuthResponse> {
+    try {
+      const result = await userService.generateNewVerificationToken(email);
+      
+      if (!result) {
+        return {
+          success: false,
+          message: 'User not found or email already verified',
+        };
+      }
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const verificationUrl = `${frontendUrl}/verify-email?token=${result.token}`;
+      
+      const emailSent = await emailService.sendVerificationEmail({
+        email: result.user.email,
+        username: result.user.username,
+        verificationToken: result.token,
+        verificationUrl
+      });
+
+      if (!emailSent) {
+        return {
+          success: false,
+          message: 'Failed to send verification email',
+        };
+      }
+
+      console.log(`✅ Verification email resent to: ${email}`);
+
+      return {
+        success: true,
+        message: 'Verification email sent! Please check your inbox.',
+      };
+    } catch (error: any) {
+      console.error('Resend verification email error:', error);
+      return {
+        success: false,
+        message: 'Failed to resend verification email',
+      };
+    }
+  }
+
+  async requestPasswordReset(email: string): Promise<AuthResponse> {
+    try {
+      const result = await userService.setPasswordResetToken(email);
+      
+      if (!result) {
+        return {
+          success: false,
+          message: 'User not found'
+        };
+      }
+
+      // Get username for email template
+      const username = result.user.username;
+
+      // Send password reset email
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      const resetUrl = `${frontendUrl}/reset-password?token=${result.token}`;
+      
+      const emailSent = await emailService.sendPasswordResetEmail({
+        email: email,
+        username: username,
+        resetToken: result.token,
+        resetUrl
+      });
+
+      if (!emailSent) {
+        return {
+          success: false,
+          message: 'Failed to send password reset email',
+        };
+      }
+
+      console.log(`✅ Password reset email sent to: ${email}`);
+
+      return {
+        success: true,
+        message: 'Password reset email sent! Please check your inbox.',
+      };
+    } catch (error: any) {
+      console.error('Password reset request error:', error);
+      return {
+        success: false,
+        message: 'Failed to process password reset request',
+      };
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<AuthResponse> {
+    try {
+      // Validate new password strength
+      const passwordValidation = userService.validatePasswordStrength(newPassword);
+      if (!passwordValidation.valid) {
+        return {
+          success: false,
+          message: passwordValidation.message || 'Password does not meet security requirements',
+        };
+      }
+
+      const result = await userService.resetPassword(token, newPassword);
+      
+      if (!result.success) {
+        return result;
+      }
+
+      console.log(`✅ Password reset successful for user: ${result.user?.email}`);
+
+      return {
+        success: true,
+        message: 'Password reset successful! You can now login with your new password.',
+        user: result.user,
+      };
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      return {
+        success: false,
+        message: 'Failed to reset password',
       };
     }
   }

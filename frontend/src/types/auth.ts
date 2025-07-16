@@ -7,6 +7,7 @@ export interface User {
   lastLoginAt?: Date;
   passwordCreatedAt: Date;
   needsPasswordChange: boolean;
+  emailVerified?: boolean;
 }
 
 export interface LoginRequest {

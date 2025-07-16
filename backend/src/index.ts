@@ -1,8 +1,10 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { databaseService } from './services/databaseService';
 import { initializeSocketHandler } from './services/socketHandler';
 import { gameService } from './services/gameService';
@@ -13,57 +15,49 @@ import { CARD_DATABASE, getCardsByMythology } from './models/cards';
 import { Mythology } from './models/types';
 import { LoginRequest, RegisterRequest, ChangePasswordRequest } from './models/user';
 
-dotenv.config();
-
 const app = express();
 const server = createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: [
-      process.env.FRONTEND_URL || "http://localhost:3000",
-      "http://localhost:3002",
-      "http://localhost:3001"
-    ],
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:3002', 'http://localhost:3001'],
+    methods: ['GET', 'POST'],
+    credentials: true,
   },
   allowEIO3: true,
-  transports: ['websocket', 'polling']
+  transports: ['websocket', 'polling'],
 });
 
 console.log('📡 Socket.IO server initialized with CORS origins:', [
-  process.env.FRONTEND_URL || "http://localhost:3000",
-  "http://localhost:3002", 
-  "http://localhost:3001"
+  process.env.FRONTEND_URL || 'http://localhost:3000',
+  'http://localhost:3002',
+  'http://localhost:3001',
 ]);
 
 const PORT = process.env.PORT || 3002;
 
 // Middleware
-app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || "http://localhost:3000",
-    "http://localhost:3002",
-    "http://localhost:3001"
-  ]
-}));
+app.use(
+  cors({
+    origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:3002', 'http://localhost:3001'],
+  })
+);
 app.use(express.json());
 
 // Routes
 app.get('/api/health', async (req, res) => {
   try {
     const dbHealth = await databaseService.healthCheck();
-    res.json({ 
-      status: 'OK', 
+    res.json({
+      status: 'OK',
       message: 'Aether Beasts API is running',
       database: dbHealth ? 'connected' : 'disconnected',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    res.status(500).json({ 
-      status: 'ERROR', 
+    res.status(500).json({
+      status: 'ERROR',
       message: 'Health check failed',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 });
@@ -87,7 +81,7 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     const registerData: RegisterRequest = req.body;
     const result = await authService.register(registerData);
-    
+
     if (result.success) {
       res.status(201).json(result);
     } else {
@@ -95,9 +89,9 @@ app.post('/api/auth/register', async (req, res) => {
     }
   } catch (error) {
     console.error('Registration endpoint error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error' 
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
     });
   }
 });
@@ -106,7 +100,7 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const loginData: LoginRequest = req.body;
     const result = await authService.login(loginData);
-    
+
     if (result.success) {
       res.status(200).json(result);
     } else {
@@ -114,9 +108,9 @@ app.post('/api/auth/login', async (req, res) => {
     }
   } catch (error) {
     console.error('Login endpoint error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error' 
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
     });
   }
 });
@@ -125,31 +119,31 @@ app.get('/api/auth/profile', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'No valid authorization token provided' 
+      return res.status(401).json({
+        success: false,
+        message: 'No valid authorization token provided',
       });
     }
 
     const token = authHeader.substring(7);
     const user = await authService.validateTokenAndGetUser(token);
-    
+
     if (user) {
-      res.status(200).json({ 
-        success: true, 
-        user 
+      res.status(200).json({
+        success: true,
+        user,
       });
     } else {
-      res.status(401).json({ 
-        success: false, 
-        message: 'Invalid or expired token' 
+      res.status(401).json({
+        success: false,
+        message: 'Invalid or expired token',
       });
     }
   } catch (error) {
     console.error('Profile endpoint error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error' 
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
     });
   }
 });
@@ -158,24 +152,24 @@ app.post('/api/auth/change-password', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'No valid authorization token provided' 
+      return res.status(401).json({
+        success: false,
+        message: 'No valid authorization token provided',
       });
     }
 
     const token = authHeader.substring(7);
     const payload = authService.verifyToken(token);
     if (!payload) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Invalid or expired token' 
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired token',
       });
     }
 
     const changePasswordData = req.body;
     const result = await authService.changePassword(payload.userId, changePasswordData);
-    
+
     if (result.success) {
       res.status(200).json(result);
     } else {
@@ -183,9 +177,118 @@ app.post('/api/auth/change-password', async (req, res) => {
     }
   } catch (error) {
     console.error('Change password endpoint error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error' 
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
+app.post('/api/auth/verify-email', async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification token is required',
+      });
+    }
+
+    const result = await authService.verifyEmail(token);
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(400).json(result);
+    }
+  } catch (error) {
+    console.error('Email verification endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
+app.post('/api/auth/resend-verification', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required',
+      });
+    }
+
+    const result = await authService.resendVerificationEmail(email);
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(400).json(result);
+    }
+  } catch (error) {
+    console.error('Resend verification email endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
+// Password reset endpoints
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required',
+      });
+    }
+
+    const result = await authService.requestPasswordReset(email);
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(400).json(result);
+    }
+  } catch (error) {
+    console.error('Password reset request endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token and new password are required',
+      });
+    }
+
+    const result = await authService.resetPassword(token, newPassword);
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(400).json(result);
+    }
+  } catch (error) {
+    console.error('Password reset endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
     });
   }
 });
@@ -198,9 +301,9 @@ app.get('/api/games/recent', async (req, res) => {
     res.json({ success: true, games });
   } catch (error) {
     console.error('Get recent games error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to fetch recent games' 
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch recent games',
     });
   }
 });
@@ -211,9 +314,9 @@ app.get('/api/games/stats', async (req, res) => {
     res.json({ success: true, stats });
   } catch (error) {
     console.error('Get game stats error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to fetch game statistics' 
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch game statistics',
     });
   }
 });
@@ -222,20 +325,20 @@ app.get('/api/games/:gameId', async (req, res) => {
   try {
     const gameId = req.params.gameId;
     const game = await gameDatabaseService.getGame(gameId);
-    
+
     if (!game) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Game not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Game not found',
       });
     }
-    
+
     res.json({ success: true, game });
   } catch (error) {
     console.error('Get game error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to fetch game' 
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch game',
     });
   }
 });
@@ -256,27 +359,27 @@ const requireAdmin = async (req: express.Request, res: express.Response, next: e
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'No valid authorization token provided' 
+      return res.status(401).json({
+        success: false,
+        message: 'No valid authorization token provided',
       });
     }
 
     const token = authHeader.substring(7);
     const payload = authService.verifyToken(token);
-    
+
     if (!payload) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Invalid or expired token' 
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired token',
       });
     }
 
     // Check if user is admin (note: role is not in DB schema yet, so this will default to false)
     if (payload.role !== 'admin') {
-      return res.status(403).json({ 
-        success: false, 
-        message: 'Admin access required' 
+      return res.status(403).json({
+        success: false,
+        message: 'Admin access required',
       });
     }
 
@@ -284,9 +387,9 @@ const requireAdmin = async (req: express.Request, res: express.Response, next: e
     next();
   } catch (error) {
     console.error('Admin middleware error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error' 
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
     });
   }
 };
@@ -295,16 +398,16 @@ const requireAdmin = async (req: express.Request, res: express.Response, next: e
 app.get('/api/admin/users', requireAdmin, async (req, res) => {
   try {
     const users = await userService.getAllUsers();
-    res.status(200).json({ 
-      success: true, 
+    res.status(200).json({
+      success: true,
       users,
-      count: users.length 
+      count: users.length,
     });
   } catch (error) {
     console.error('Get users error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to fetch users' 
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch users',
     });
   }
 });
@@ -315,24 +418,24 @@ app.delete('/api/admin/users/:userId', requireAdmin, async (req, res) => {
     const currentUser = (req as any).user;
 
     if (userId === currentUser.userId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Cannot delete your own account' 
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot delete your own account',
       });
     }
 
     await userService.deleteUser(userId);
-    
+
     console.log(`User ${userId} deleted by admin ${currentUser.username}`);
-    res.status(200).json({ 
-      success: true, 
-      message: 'User deleted successfully' 
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully',
     });
   } catch (error) {
     console.error('Delete user error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to delete user' 
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete user',
     });
   }
 });
@@ -350,7 +453,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 async function startServer() {
   try {
     await databaseService.connect();
-    
+
     server.listen(PORT, () => {
       console.log(`🚀 Aether Beasts server running on port ${PORT}`);
       console.log(`WebSocket server ready for connections`);

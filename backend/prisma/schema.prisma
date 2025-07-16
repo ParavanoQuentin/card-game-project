@@ -20,6 +20,15 @@ model User {
   passwordHash String   @map("password_hash")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
+  
+  // Email verification fields
+  emailVerified Boolean @default(false) @map("email_verified")
+  emailVerificationToken String? @map("email_verification_token")
+  emailVerificationTokenExpiry DateTime? @map("email_verification_token_expiry")
+  
+  // Password reset fields
+  passwordResetToken String? @map("password_reset_token")
+  passwordResetTokenExpiry DateTime? @map("password_reset_token_expiry")
 
   // Relations
   gamesAsPlayer1 Game[] @relation("Player1Games")
@@ -72,4 +81,30 @@ model GameAction {
   @@index([gameId])
   @@index([turnNumber])
   @@map("game_actions")
+}
+
+model Card {
+  id          String   @id
+  name        String
+  type        String   // CardType enum as string
+  mythology   String   // Mythology enum as string
+  description String
+  imageUrl    String?  @map("image_url")
+  
+  // Beast specific fields
+  hp              Int?
+  maxHp           Int?     @map("max_hp")
+  attacks         String?  // JSON string for attacks array
+  passiveEffect   String?  @map("passive_effect") // JSON string for passive effect
+  
+  // Technique specific fields
+  techniqueEffect String?  @map("technique_effect") // JSON string for technique effect
+  
+  // Artifact specific fields
+  artifactEffect  String?  @map("artifact_effect") // JSON string for artifact effect
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("cards")
 }

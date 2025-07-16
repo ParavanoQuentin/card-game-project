@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { prisma } from './databaseService';
 import { User, UserProfile } from '../models/user';
 
@@ -96,11 +97,17 @@ class UserService {
 
     const passwordHash = await this.hashPassword(password);
 
+    // Generate email verification token
+    const { token, expiry } = this.generateEmailVerificationToken();
+
     const user = await prisma.user.create({
       data: {
         email: email.toLowerCase(),
         username,
         passwordHash,
+        emailVerified: false,
+        emailVerificationToken: token,
+        emailVerificationTokenExpiry: expiry,
       }
     });
 
@@ -197,7 +204,12 @@ class UserService {
       lastLoginAt: undefined,
       passwordCreatedAt: prismaUser.createdAt,
       failedLoginAttempts: 0,
-      lockedUntil: undefined
+      lockedUntil: undefined,
+      emailVerified: prismaUser.emailVerified || false,
+      emailVerificationToken: prismaUser.emailVerificationToken,
+      emailVerificationTokenExpiry: prismaUser.emailVerificationTokenExpiry,
+      passwordResetToken: prismaUser.passwordResetToken,
+      passwordResetTokenExpiry: prismaUser.passwordResetTokenExpiry
     };
   }
 
@@ -250,6 +262,197 @@ class UserService {
       console.log(`User ${userId} role updated to ${role} (note: role not persisted to DB yet)`);
     }
     return user;
+  }
+
+  /**
+   * Generate email verification token
+   */
+  generateEmailVerificationToken(): { token: string; expiry: Date } {
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+    return { token, expiry };
+  }
+
+  /**
+   * Update user with email verification token
+   */
+  async setEmailVerificationToken(userId: string, token: string, expiry: Date): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailVerificationToken: token,
+        emailVerificationTokenExpiry: expiry,
+        updatedAt: new Date()
+      }
+    });
+  }
+
+  /**
+   * Verify email with token
+   */
+  async verifyEmail(token: string): Promise<User | null> {
+    const user = await prisma.user.findFirst({
+      where: {
+        emailVerificationToken: token,
+        emailVerificationTokenExpiry: {
+          gt: new Date() // Token must not be expired
+        }
+      }
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    // Mark email as verified and clear verification token
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerified: true,
+        emailVerificationToken: null,
+        emailVerificationTokenExpiry: null,
+        updatedAt: new Date()
+      }
+    });
+
+    return this.mapPrismaUserToUser(updatedUser);
+  }
+
+  /**
+   * Find user by verification token
+   */
+  async findUserByVerificationToken(token: string): Promise<User | null> {
+    const user = await prisma.user.findFirst({
+      where: {
+        emailVerificationToken: token,
+        emailVerificationTokenExpiry: {
+          gt: new Date()
+        }
+      }
+    });
+
+    return user ? this.mapPrismaUserToUser(user) : null;
+  }
+
+  /**
+   * Resend verification email (generates new token)
+   */
+  async generateNewVerificationToken(email: string): Promise<{ user: User; token: string; expiry: Date } | null> {
+    const user = await this.findUserByEmail(email);
+    if (!user || user.emailVerified) {
+      return null;
+    }
+
+    const { token, expiry } = this.generateEmailVerificationToken();
+    await this.setEmailVerificationToken(user.id, token, expiry);
+
+    return { user, token, expiry };
+  }
+
+  /**
+   * Generate password reset token
+   */
+  generatePasswordResetToken(): { token: string; expiry: Date } {
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+    return { token, expiry };
+  }
+
+  /**
+   * Set password reset token for user
+   */
+  async setPasswordResetToken(email: string): Promise<{ user: User; token: string; expiry: Date } | null> {
+    const user = await this.findUserByEmail(email);
+    if (!user) {
+      return null;
+    }
+
+    const { token, expiry } = this.generatePasswordResetToken();
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken: token,
+        passwordResetTokenExpiry: expiry,
+        updatedAt: new Date()
+      }
+    });
+
+    return { user, token, expiry };
+  }
+
+  /**
+   * Find user by password reset token
+   */
+  async findUserByPasswordResetToken(token: string): Promise<User | null> {
+    const user = await prisma.user.findFirst({
+      where: {
+        passwordResetToken: token,
+        passwordResetTokenExpiry: {
+          gt: new Date() // Token must not be expired
+        }
+      }
+    });
+
+    return user ? this.mapPrismaUserToUser(user) : null;
+  }
+
+  /**
+   * Reset password with token
+   */
+  async resetPasswordWithToken(token: string, newPassword: string): Promise<User | null> {
+    const user = await this.findUserByPasswordResetToken(token);
+    if (!user) {
+      return null;
+    }
+
+    const passwordHash = await this.hashPassword(newPassword);
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetTokenExpiry: null,
+        updatedAt: new Date()
+      }
+    });
+
+    return this.mapPrismaUserToUser(updatedUser);
+  }
+
+  /**
+   * Reset a user's password using a valid token (for API)
+   */
+  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string; user?: UserProfile }> {
+    const user = await this.findUserByPasswordResetToken(token);
+    
+    if (!user) {
+      return {
+        success: false,
+        message: 'Invalid or expired password reset token'
+      };
+    }
+
+    // Hash the new password
+    const passwordHash = await this.hashPassword(newPassword);
+
+    // Update user's password and clear reset token
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetTokenExpiry: null,
+        updatedAt: new Date()
+      }
+    });
+
+    return {
+      success: true,
+      message: 'Password reset successfully',
+      user: this.userToProfile(this.mapPrismaUserToUser(updatedUser))
+    };
   }
 }
 
